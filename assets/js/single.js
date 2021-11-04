@@ -1,4 +1,24 @@
+//DOM REFERENCES
 let issueContainerEl = document.querySelector('#issues-container');
+let limitWarningEl = document.querySelector('#limit-warning');
+let repoNameEl = document.querySelector('#repo-name');
+
+
+let getRepoName = function () {
+    //grab repo name from url query string
+    let queryString = document.location.search;
+    let repoName = queryString.split("=")[1];
+    
+    if (repoName) {
+        //display repo name on page
+        repoName.textContent = repoName;
+
+        getRepoIssues(repoName);
+    } else {
+        //if no repp was given, redirect to homepage
+        document.location.replace("./index.html");
+    };
+};
 
 let getRepoIssues = function(repo) {
     var apiUrl = "http://api.github.com/repos/" + repo + "/issues?direction=asc";
@@ -9,10 +29,16 @@ let getRepoIssues = function(repo) {
             response.json().then(function(data) {
                 //pass response data to dom function
                 displayIssues(data);
+
+                //check if api has paginated issues
+                if (response.headers.get("Link")) {
+                    displayWarning(repo);
+                }
             });
         }
         else {
-            alert("There was a problem with your request!");
+            //if not successful redirect to the homepage
+            document.location.replace("./index.html");
         }
     });
 };
@@ -54,4 +80,17 @@ let displayIssues = function(issues) {
     
 };
 
-getRepoIssues("erin-michon/code-quiz");
+let displayWarning = function(repo) {
+    limitWarningEl.textContent="To see more than 30 issues, visit ";
+
+    let linkEl = document.createElement("a");
+    linkEl.textContent = "See More Issues on GitHub.com"
+    linkEl.setAttribute("href", "http://api.github.com/repos/" + repo + "/issues");
+    linkEl.setAttribute("target", "_blank");
+
+    //append to container
+    limitWarningEl.appendChild(linkEl);
+
+};
+
+getRepoName();
