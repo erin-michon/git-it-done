@@ -34,7 +34,7 @@ var getUserRepos = function(user) {
         console.log(response);
         response.json().then(function(data) {
           console.log(data);
-          displayRepos(data, user);
+          displayRepos(data, user);  // called this function in here, passing the parameters (locally defined) into the global function
         });
       } else {
         alert("Error: " + response.statusText);
